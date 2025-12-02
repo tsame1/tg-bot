@@ -8,8 +8,8 @@ from config import ADMIN_IDS
 
 log_path = os.path.join(os.path.dirname(__file__), 'bot.log')
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler(log_path, encoding='utf-8'),
         logging.StreamHandler()
@@ -27,13 +27,13 @@ async def on_startup():
 
     for admin_id in ADMIN_IDS:
         try:
-            await bot.send_message(admin_id, "Бот успешно запущен на Railway!")
+            await bot.send_message(admin_id, "Бот запущен на Railway!")
         except Exception as e:
             logging.error(f"Не смог написать админу {admin_id}: {e}")
 
 async def main():
-    # Импортируем хэндлеры (важно, чтобы они зарегистрировались)
-    from handlers import start, profile, support, products, topup, admin  # noqa: F401, E402
+    # Импортируем хэндлеры только после создания dp
+    import handlers  # <-- просто импортируем папку, роутеры сами подключатся
 
     await on_startup()
     await dp.start_polling(bot, skip_updates=True)
