@@ -6,7 +6,6 @@ from utils.db_api import create_db, ensure_language_column
 from utils.set_bot_commands import set_only_start_everywhere
 from config import ADMIN_IDS
 
-# Логи
 log_path = os.path.join(os.path.dirname(__file__), 'bot.log')
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -18,7 +17,7 @@ logging.basicConfig(
 )
 
 async def on_startup():
-    logging.info("Запуск бота...")
+    logging.info("Бот запускается...")
     await create_db()
     await ensure_language_column()
     try:
@@ -33,8 +32,8 @@ async def on_startup():
             logging.error(f"Не смог написать админу {admin_id}: {e}")
 
 async def main():
-    # Регистрация хэндлеров (важно импортировать!)
-    from handlers import start, profile, support, products, topup, admin  # noqa: F401
+    # Импортируем хэндлеры (важно, чтобы они зарегистрировались)
+    from handlers import start, profile, support, products, topup, admin  # noqa: F401, E402
 
     await on_startup()
     await dp.start_polling(bot, skip_updates=True)
