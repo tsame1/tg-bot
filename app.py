@@ -27,14 +27,16 @@ async def on_startup():
 
     for admin_id in ADMIN_IDS:
         try:
-            await bot.send_message(admin_id, "Бот запущен на Railway!")
+            await bot.send_message(admin_id, "Бот запущен на Railway! Готов к работе")
         except Exception as e:
             logging.error(f"Не смог написать админу {admin_id}: {e}")
 
 async def main():
-    # Импортируем хэндлеры только после создания dp
-    import handlers  # <-- просто импортируем папку, роутеры сами подключатся
-
+    # ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+    # ВОТ ЭТА СТРОКА — ОДНА ЕДИНСТВЕННАЯ
+    import handlers  # ← теперь всё подключается через __init__.py
+    # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    
     await on_startup()
     await dp.start_polling(bot, skip_updates=True)
 
