@@ -4,13 +4,11 @@ import os
 load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_IDS = list(map(int, os.getenv("ADMIN_IDS").split(",")))
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-CRYPTO_API_URL = os.getenv("CRYPTO_API_URL")
-REVOLUT_PAYMENT_LINK = os.getenv("REVOLUT_PAYMENT_LINK")
-CRYPTO_WALLET_ADDRESS = os.getenv("CRYPTO_WALLET_ADDRESS")
-CURATOR_USERNAME = os.getenv("CURATOR_USERNAME")
+ADMIN_IDS = list(map(int, os.getenv("ADMIN_IDS", "0").split(","))) if os.getenv("ADMIN_IDS") else []
+CHANNEL_ID = int(os.getenv("CHANNEL_ID", "0")) if os.getenv("CHANNEL_ID") not in ("0", "") else None
 
+# Остальные переменные — как у тебя было
+REVOLUT_PAYMENT_LINK = os.getenv("REVOLUT_PAYMENT_LINK")
 CRYPTO_ADDRESSES = {
     "sol": os.getenv("SOL_ADDRESS"),
     "eth": os.getenv("ETH_ADDRESS"),
@@ -21,3 +19,4 @@ CRYPTO_ADDRESSES = {
     "usdt_sol": os.getenv("USDT_SOL"),
     "usdt_erc20": os.getenv("USDT_ERC20")
 }
+# + остальные, если есть

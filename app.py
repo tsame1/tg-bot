@@ -1,40 +1,43 @@
-from aiogram import executor
-from loader import dp
-from utils.db_api import create_db, ensure_language_column
-from utils.set_bot_commands import set_only_start_everywhere  # только /start глобально
-from config import ADMIN_IDS
-# Регистрируем все хэндлеры (важно импортировать, чтобы они повесились на dp)
-from handlers import start, profile, support, products, topup, admin
+import asyncio
 import logging
 import os
+from loader import dp, bot
+from utils.db_api import create_db, ensure_language_column
+from utils.set_bot_commands import set_only_start_everywhere
+from config import ADMIN_IDS
 
-# Логи рядом с приложением
+# Логи
 log_path = os.path.join(os.path.dirname(__file__), 'bot.log')
-logging.basicConfig(filename=log_path, level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler(log_path, encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
 
-
-async def on_startup(_):
-    print("Starting bot...")
-    # 1) Инициализация БД
+async def on_startup():
+    logging.info("Запуск бота...")
     await create_db()
-    # 2) Добавляем колонку language, если её нет
     await ensure_language_column()
-    # 3) Устанавливаем глобальные команды: ТОЛЬКО /start (во всех локалях + fallback)
     try:
-        await set_only_start_everywhere(dp)
+        await set_only_start_everywhere()
     except Exception as e:
-        logging.error(f"[startup] Failed to set only-start commands globally: {e}")
+        logging.error(f"Ошибка установки команд: {e}")
 
-    logging.info("Database initialized, language ensured, only-start commands set. Bot started.")
-
-    # 4) Оповещение админов о запуске (необязательно)
     for admin_id in ADMIN_IDS:
         try:
-            await dp.bot.send_message(admin_id, "🤖 Бот успешно запущен!")
+            await bot.send_message(admin_id, "Бот успешно запущен на Railway!")
         except Exception as e:
-            logging.error(f"Failed to notify admin {admin_id}: {e}")
+            logging.error(f"Не смог написать админу {admin_id}: {e}")
 
+async def main():
+    # Регистрация хэндлеров (важно импортировать!)
+    from handlers import start, profile, support, products, topup, admin  # noqa: F401
+
+    await on_startup()
+    await dp.start_polling(bot, skip_updates=True)
 
 if __name__ == '__main__':
-    # Пропускаем старые апдейты
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+    asyncio.run(main())
